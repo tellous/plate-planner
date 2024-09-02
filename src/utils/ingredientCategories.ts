@@ -20,5 +20,5 @@ export function categorizeIngredient(ingredient: string): IngredientCategory {
     }
   }
   
-  return 'Other';
+  return 'other';
 }

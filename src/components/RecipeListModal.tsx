@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import RecipeList from './RecipeList';
 import { Recipe, MealTime } from '../hooks/useRecipes';
+import Fuse from 'fuse.js';
 
 interface Props {
     recipes: Recipe[];
@@ -37,6 +38,28 @@ export default function RecipeListModal({ recipes, onClose, onEdit, onDelete, on
             onDeleteAll();
         }
     };
+
+    const fuse = useMemo(() => new Fuse(recipes, {
+        keys: ['name', 'url'],
+        threshold: 0.3,
+    }), [recipes]);
+
+    const filteredRecipes = useMemo(() => {
+        let result = recipes;
+
+        if (searchTerm) {
+            result = fuse.search(searchTerm).map(result => result.item);
+        }
+
+        result = result.filter(recipe => {
+            const mealTimeMatch = selectedMealTimes.length === 0 || recipe.mealTimes.some(mealTime => selectedMealTimes.includes(mealTime));
+            const minIngredientsMatch = minIngredients === '' || recipe.ingredients.length >= parseInt(minIngredients);
+            const maxIngredientsMatch = maxIngredients === '' || recipe.ingredients.length <= parseInt(maxIngredients);
+            return mealTimeMatch && minIngredientsMatch && maxIngredientsMatch;
+        });
+
+        return result;
+    }, [recipes, searchTerm, selectedMealTimes, minIngredients, maxIngredients, fuse]);
 
     return (
         <div className="modal">
@@ -95,7 +118,7 @@ export default function RecipeListModal({ recipes, onClose, onEdit, onDelete, on
                 </div>
                 <div className="modal-body">
                     <RecipeList
-                        recipes={recipes}
+                        recipes={filteredRecipes}
                         onEdit={onEdit}
                         onDelete={onDelete}
                         searchTerm={searchTerm}

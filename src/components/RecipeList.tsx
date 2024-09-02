@@ -18,6 +18,7 @@ export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, sele
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editValues, setEditValues] = useState<Recipe>({
         id: '',
+        name: '',
         url: '',
         difficulty: 0,
         mealTimes: [],
@@ -29,6 +30,7 @@ export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, sele
         const recipe = recipes.find(r => r.id === id);
         setEditValues(recipe || {
             id: '',
+            name: '',
             url: '',
             difficulty: 0,
             mealTimes: [],
@@ -40,6 +42,7 @@ export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, sele
         setEditingId(null);
         setEditValues({
             id: '',
+            name: '',
             url: '',
             difficulty: 0,
             mealTimes: [],

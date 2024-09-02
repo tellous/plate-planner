@@ -647,10 +647,6 @@ input {
     word-break: break-word;
   }
 
-  .recipe-selection-url {
-    text-align: center;
-  }
-
   .action-cell {
     align-items: center;
   }
@@ -677,7 +673,10 @@ input {
   }
 }
 
-/* Add this to your existing CSS file */
+.recipe-selection-item {
+  padding: 10px;
+  text-align: center;
+}
 
 .edit-button {
   background-color: var(--edit-button-color);

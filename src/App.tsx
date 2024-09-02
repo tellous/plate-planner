@@ -13,17 +13,24 @@ function App() {
   const [showRecipeListModal, setShowRecipeListModal] = useState(false);
   const [showWeeklyIngredientsModal, setShowWeeklyIngredientsModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [enabledMeals, setEnabledMeals] = useState<MealTime[]>(['breakfast', 'lunch', 'dinner']);
-  const [allowReset, setAllowReset] = useState(false);
-
-  const handleToggleMeal = (meal: MealTime) => {
-    setEnabledMeals(prev =>
-      prev.includes(meal) ? prev.filter(m => m !== meal) : [...prev, meal]
-    );
-  };
+  const [enabledMeals, setEnabledMeals] = useState<MealTime[]>(() => {
+    const savedEnabledMeals = localStorage.getItem('enabledMeals');
+    return savedEnabledMeals ? JSON.parse(savedEnabledMeals) : ['breakfast', 'lunch', 'dinner'];
+  });
+  const [allowReset, setAllowReset] = useState(() => {
+    const savedAllowReset = localStorage.getItem('allowReset');
+    return savedAllowReset ? JSON.parse(savedAllowReset) : false;
+  });
 
   const handleDataImport = () => {
     window.location.reload();
+  };
+
+  const handleSaveSettings = (newEnabledMeals: MealTime[], newAllowReset: boolean) => {
+    setEnabledMeals(newEnabledMeals);
+    setAllowReset(newAllowReset);
+    localStorage.setItem('enabledMeals', JSON.stringify(newEnabledMeals));
+    localStorage.setItem('allowReset', JSON.stringify(newAllowReset));
   };
 
   return (
@@ -57,10 +64,9 @@ function App() {
       {showSettings && (
         <Settings
           enabledMeals={enabledMeals}
-          onToggleMeal={handleToggleMeal}
+          onSaveSettings={handleSaveSettings}
           onClose={() => setShowSettings(false)}
           allowReset={allowReset}
-          onAllowResetChange={setAllowReset}
           onDataImport={handleDataImport}
         />
       )}

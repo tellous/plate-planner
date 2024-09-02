@@ -26,7 +26,7 @@ export default function RecipeSelectionModal({ recipes, onSelect, onClose, mealT
     }, [recipes, mealTime, minIngredients, maxIngredients]);
 
     const fuse = useMemo(() => new Fuse(filteredRecipes, {
-        keys: ['url'],
+        keys: ['name', 'url'],
         threshold: 0.3,
     }), [filteredRecipes]);
 

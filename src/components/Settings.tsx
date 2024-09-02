@@ -4,17 +4,25 @@ import { exportData, importData } from '../utils/dataUtils';
 
 interface Props {
   enabledMeals: MealTime[];
-  onToggleMeal: (meal: MealTime) => void;
+  onSaveSettings: (newEnabledMeals: MealTime[], newAllowReset: boolean) => void;
   onClose: () => void;
   allowReset: boolean;
-  onAllowResetChange: (allow: boolean) => void;
   onDataImport: () => void;
 }
 
-export default function Settings({ enabledMeals, onToggleMeal, onClose, allowReset, onAllowResetChange, onDataImport }: Props) {
+export default function Settings({ enabledMeals, onSaveSettings, onClose, allowReset, onDataImport }: Props) {
   const allMeals: MealTime[] = ['breakfast', 'lunch', 'dinner'];
+  const [tempEnabledMeals, setTempEnabledMeals] = useState<MealTime[]>(enabledMeals);
+  const [tempAllowReset, setTempAllowReset] = useState(allowReset);
+
+  const handleToggleMeal = (meal: MealTime) => {
+    setTempEnabledMeals(prev =>
+      prev.includes(meal) ? prev.filter(m => m !== meal) : [...prev, meal]
+    );
+  };
 
   const handleSave = () => {
+    onSaveSettings(tempEnabledMeals, tempAllowReset);
     onClose();
   };
 
@@ -48,8 +56,8 @@ export default function Settings({ enabledMeals, onToggleMeal, onClose, allowRes
               <label key={meal} className="meal-time-filter">
                 <input
                   type="checkbox"
-                  checked={enabledMeals.includes(meal)}
-                  onChange={() => onToggleMeal(meal)}
+                  checked={tempEnabledMeals.includes(meal)}
+                  onChange={() => handleToggleMeal(meal)}
                 />
                 {meal}
               </label>
@@ -60,8 +68,8 @@ export default function Settings({ enabledMeals, onToggleMeal, onClose, allowRes
             <label className="toggle-switch">
               <input
                 type="checkbox"
-                checked={allowReset}
-                onChange={(e) => onAllowResetChange(e.target.checked)}
+                checked={tempAllowReset}
+                onChange={(e) => setTempAllowReset(e.target.checked)}
               />
               <span className="slider"></span>
             </label>
