@@ -1,61 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import WeeklyRecipes from './components/WeeklyRecipes';
 import AddRecipeModal from './components/AddRecipeModal';
 import RecipeListModal from './components/RecipeListModal';
 import Settings from './components/Settings';
+import WeeklyIngredientsModal from './components/WeeklyIngredientsModal';
 import { useRecipes, MealTime } from './hooks/useRecipes';
 import './App.css';
 
 function App() {
-  const [showInput, setShowInput] = useState(false);
-  const [showList, setShowList] = useState(false);
+  const { recipes, addRecipe, updateRecipe, deleteRecipe, resetToDefault, deleteAllRecipes } = useRecipes();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showRecipeListModal, setShowRecipeListModal] = useState(false);
+  const [showWeeklyIngredientsModal, setShowWeeklyIngredientsModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [enabledMeals, setEnabledMeals] = useState<MealTime[]>(['breakfast', 'lunch', 'dinner']);
-  const { recipes, addRecipe, updateRecipe, deleteRecipe, resetToDefault } = useRecipes();
+  const [allowReset, setAllowReset] = useState(false);
 
   const handleToggleMeal = (meal: MealTime) => {
-    setEnabledMeals((prev) =>
-      prev.includes(meal) ? prev.filter((m) => m !== meal) : [...prev, meal]
+    setEnabledMeals(prev =>
+      prev.includes(meal) ? prev.filter(m => m !== meal) : [...prev, meal]
     );
+  };
+
+  const handleDataImport = () => {
+    window.location.reload();
   };
 
   return (
     <div className="App">
-      <div className="header-container">
-        <h1>Weekly Recipe Planner</h1>
+      <header className="App-header">
+        <h1>plate planner</h1>
+        <div className="floral-separator"></div>
         <div className="header-buttons">
-          <button onClick={() => setShowInput(true)} className="header-button">Add Recipes</button>
-          <button onClick={() => setShowList(true)} className="header-button">View All Recipes</button>
-          <button onClick={() => setShowSettings(true)} className="header-button">Settings</button>
+          <button onClick={() => setShowAddModal(true)} className="header-button">➕</button>
+          <button onClick={() => setShowRecipeListModal(true)} className="header-button">📃</button>
+          <button onClick={() => setShowSettings(true)} className="header-button">⚙️</button>
         </div>
-      </div>
-
-      {showInput && (
-        <AddRecipeModal
-          onAdd={addRecipe}
-          onClose={() => setShowInput(false)}
-        />
+      </header>
+      <main className="main-content">
+        <WeeklyRecipes recipes={recipes} enabledMeals={enabledMeals} />
+      </main>
+      {showAddModal && (
+        <AddRecipeModal onAdd={addRecipe} onClose={() => setShowAddModal(false)} />
       )}
-
-      {showList && (
+      {showRecipeListModal && (
         <RecipeListModal
           recipes={recipes}
-          onClose={() => setShowList(false)}
+          onClose={() => setShowRecipeListModal(false)}
           onEdit={updateRecipe}
           onDelete={deleteRecipe}
           onResetToDefault={resetToDefault}
+          onDeleteAll={deleteAllRecipes}
+          allowReset={allowReset}
         />
       )}
-
       {showSettings && (
         <Settings
           enabledMeals={enabledMeals}
           onToggleMeal={handleToggleMeal}
-          onClose={() => setShowSettings(false)}  // Add this line
+          onClose={() => setShowSettings(false)}
+          allowReset={allowReset}
+          onAllowResetChange={setAllowReset}
+          onDataImport={handleDataImport}
         />
       )}
-
-      <WeeklyRecipes recipes={recipes} enabledMeals={enabledMeals} />
+      <div className="floating-button-container">
+        <button
+          className="floating-button"
+          onClick={() => setShowWeeklyIngredientsModal(true)}
+        >
+          🧺 view weekly ingredients
+        </button>
+      </div>
+      {showWeeklyIngredientsModal && (
+        <WeeklyIngredientsModal
+          onClose={() => setShowWeeklyIngredientsModal(false)}
+          enabledMeals={enabledMeals}
+        />
+      )}
     </div>
   );
 }

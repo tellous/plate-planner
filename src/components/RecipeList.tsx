@@ -2,141 +2,110 @@ import React, { useState } from 'react';
 import { Recipe, MealTime } from '../hooks/useRecipes';
 import DifficultyRating from './DifficultyRating';
 import { extractRecipeNameFromUrl } from '../utils/stringUtils';
+import RecipeForm from './RecipeForm';
 
 interface Props {
-  recipes: Recipe[];
-  onEdit: (id: string, updates: Partial<Recipe>) => void;
-  onDelete: (id: string) => void;
-  searchTerm: string;
-  selectedMealTimes: MealTime[];
+    recipes: Recipe[];
+    onEdit: (recipe: Recipe) => void;
+    onDelete: (id: string) => void;
+    searchTerm: string;
+    selectedMealTimes: MealTime[];
+    minIngredients: string;
+    maxIngredients: string;
 }
 
-export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, selectedMealTimes }: Props) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<Partial<Recipe>>({});
-  const [error, setError] = useState('');
+export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, selectedMealTimes, minIngredients, maxIngredients }: Props) {
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editValues, setEditValues] = useState<Recipe>({
+        id: '',
+        url: '',
+        difficulty: 0,
+        mealTimes: [],
+        ingredients: []
+    });
 
-  const handleEdit = (id: string) => {
-    setEditingId(id);
-    setEditValues(recipes.find(r => r.id === id) || {});
-    setError('');
-  };
+    const handleEdit = (id: string) => {
+        setEditingId(id);
+        const recipe = recipes.find(r => r.id === id);
+        setEditValues(recipe || {
+            id: '',
+            url: '',
+            difficulty: 0,
+            mealTimes: [],
+            ingredients: []
+        });
+    };
 
-  const handleSave = (id: string) => {
-    if (!editValues.mealTimes || editValues.mealTimes.length === 0) {
-      setError('Please select at least one meal time.');
-      return;
-    }
-    onEdit(id, editValues);
-    setEditingId(null);
-    setEditValues({});
-    setError('');
-  };
+    const handleCancel = () => {
+        setEditingId(null);
+        setEditValues({
+            id: '',
+            url: '',
+            difficulty: 0,
+            mealTimes: [],
+            ingredients: []
+        });
+    };
 
-  const handleCancel = () => {
-    setEditingId(null);
-    setEditValues({});
-    setError('');
-  };
+    const filteredRecipes = recipes.filter(recipe => {
+        const recipeName = extractRecipeNameFromUrl(recipe.url);
+        const nameMatch = recipeName.toLowerCase().includes(searchTerm.toLowerCase());
+        const mealTimeMatch = selectedMealTimes.length === 0 || recipe.mealTimes.some(mealTime => selectedMealTimes.includes(mealTime));
+        const minIngredientsMatch = minIngredients === '' || recipe.ingredients.length >= parseInt(minIngredients);
+        const maxIngredientsMatch = maxIngredients === '' || recipe.ingredients.length <= parseInt(maxIngredients);
+        return nameMatch && mealTimeMatch && minIngredientsMatch && maxIngredientsMatch;
+    });
 
-  const handleChange = (field: keyof Recipe, value: string | number | MealTime[]) => {
-    setEditValues(prev => ({ ...prev, [field]: value }));
-    setError('');
-  };
-
-  const handleMealTimeToggle = (mealTime: MealTime) => {
-    const currentMealTimes = editValues.mealTimes || [];
-    const newMealTimes = currentMealTimes.includes(mealTime)
-      ? currentMealTimes.filter(mt => mt !== mealTime)
-      : [...currentMealTimes, mealTime];
-    handleChange('mealTimes', newMealTimes);
-  };
-
-  const filteredRecipes = recipes.filter(recipe =>
-    extractRecipeNameFromUrl(recipe.url).toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedMealTimes.length === 0 || recipe.mealTimes.some(mt => selectedMealTimes.includes(mt)))
-  );
-
-  return (
-    <div className="recipe-list">
-      {filteredRecipes.map(recipe => (
-        <div key={recipe.id} className="recipe-row">
-          <div className="recipe-cell url-cell">
-            {editingId === recipe.id ? (
-              <input
-                type="text"
-                value={editValues.url || recipe.url}
-                onChange={e => handleChange('url', e.target.value)}
-              />
-            ) : (
-              <a href={recipe.url} target="_blank" rel="noopener noreferrer">
-                {extractRecipeNameFromUrl(recipe.url)}
-              </a>
-            )}
-          </div>
-          <div className="recipe-cell difficulty-cell">
-            {editingId === recipe.id ? (
-              <DifficultyRating
-                rating={editValues.difficulty || recipe.difficulty}
-                onRatingChange={(value) => handleChange('difficulty', value)}
-                maxRating={10}
-              />
-            ) : (
-              <DifficultyRating
-                rating={recipe.difficulty}
-                onRatingChange={() => {}}
-                maxRating={10}
-                readOnly={true}
-              />
-            )}
-          </div>
-          <div className="recipe-cell meal-times-cell">
-            {editingId === recipe.id ? (
-              <div className="meal-time-checkboxes">
-                {['breakfast', 'lunch', 'dinner'].map((mealTime) => (
-                  <label key={mealTime} className="meal-time-filter">
-                    <input
-                      type="checkbox"
-                      checked={(editValues.mealTimes || recipe.mealTimes).includes(mealTime as MealTime)}
-                      onChange={() => handleMealTimeToggle(mealTime as MealTime)}
-                      className="meal-time-checkbox"
-                    />
-                    {mealTime.charAt(0).toUpperCase() + mealTime.slice(1)}
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <div className="meal-times">
-                {recipe.mealTimes.map(mealTime => (
-                  <span key={mealTime} className="meal-time-tag">
-                    {mealTime.charAt(0).toUpperCase() + mealTime.slice(1)}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="recipe-cell action-cell">
-            {editingId === recipe.id && (
-              <div className="error-container">
-                {error && <div className="error-message">{error}</div>}
-              </div>
-            )}
-            <div className="action-buttons">
-              {editingId === recipe.id ? (
-                <>
-                  <button onClick={() => handleSave(recipe.id)} className="modal-button primary-button">Save</button>
-                  <button onClick={handleCancel} className="modal-button secondary-button">Cancel</button>
-                </>
-              ) : (
-                <>
-                  <button onClick={() => handleEdit(recipe.id)} className="modal-button edit-button">Edit</button>
-                  <button onClick={() => onDelete(recipe.id)} className="modal-button delete-button">Delete</button>
-                </>
-              )}
-            </div>
-          </div>
+    return (
+        <div className="recipe-list">
+            {filteredRecipes.map(recipe => (
+                <div key={recipe.id} className="recipe-row">
+                    {editingId === recipe.id ? (
+                        <div className="recipe-cell form-cell">
+                            <RecipeForm
+                                initialValues={editValues}
+                                onSubmit={onEdit}
+                                onClose={handleCancel}
+                                submitButtonText="save"
+                            />
+                        </div>
+                    ) : (
+                        <>
+                            <div className="recipe-cell url-cell">
+                                <a href={recipe.url} target="_blank" rel="noopener noreferrer">
+                                    {recipe.name || extractRecipeNameFromUrl(recipe.url)}
+                                </a>
+                            </div>
+                            <div className="recipe-cell difficulty-cell">
+                                <DifficultyRating
+                                    rating={recipe.difficulty}
+                                    onRatingChange={() => { }}
+                                    maxRating={10}
+                                    readOnly={true}
+                                />
+                            </div>
+                            <div className="recipe-cell meal-times-cell">
+                                <div className="meal-times">
+                                    {recipe.mealTimes.map(mealTime => (
+                                        <span key={mealTime} className="meal-time-tag">
+                                            {mealTime}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="recipe-cell ingredient-count-cell">
+                                Ingredients: {recipe.ingredients.length}
+                            </div>
+                            <div className="recipe-cell action-cell">
+                                <div className="action-buttons">
+                                    <button onClick={() => handleEdit(recipe.id)} className="modal-button edit-button">edit</button>
+                                    <button onClick={() => onDelete(recipe.id)} className="modal-button delete-button">delete</button>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            ))}
         </div>
-      ))}
-    </div>
-  );
+    );
 }
