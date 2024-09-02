@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Recipe, MealTime } from '../hooks/useRecipes';
 import DifficultyRating from './DifficultyRating';
-import { extractRecipeNameFromUrl } from '../utils/stringUtils';
 import RecipeForm from './RecipeForm';
 
 interface Props {
@@ -50,18 +49,9 @@ export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, sele
         });
     };
 
-    const filteredRecipes = recipes.filter(recipe => {
-        const recipeName = extractRecipeNameFromUrl(recipe.url);
-        const nameMatch = recipeName.toLowerCase().includes(searchTerm.toLowerCase());
-        const mealTimeMatch = selectedMealTimes.length === 0 || recipe.mealTimes.some(mealTime => selectedMealTimes.includes(mealTime));
-        const minIngredientsMatch = minIngredients === '' || recipe.ingredients.length >= parseInt(minIngredients);
-        const maxIngredientsMatch = maxIngredients === '' || recipe.ingredients.length <= parseInt(maxIngredients);
-        return nameMatch && mealTimeMatch && minIngredientsMatch && maxIngredientsMatch;
-    });
-
     return (
         <div className="recipe-list">
-            {filteredRecipes.map(recipe => (
+            {recipes.map(recipe => (
                 <div key={recipe.id} className="recipe-row">
                     {editingId === recipe.id ? (
                         <div className="recipe-cell form-cell">
@@ -76,7 +66,7 @@ export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, sele
                         <>
                             <div className="recipe-cell url-cell">
                                 <a href={recipe.url} target="_blank" rel="noopener noreferrer">
-                                    {recipe.name || extractRecipeNameFromUrl(recipe.url)}
+                                    {recipe.name}
                                 </a>
                             </div>
                             <div className="recipe-cell difficulty-cell">

@@ -156,8 +156,8 @@ export default function RecipeForm({ initialValues, onSubmit, onClose, submitBut
             </div>
             {error && <p className="error">{error}</p>}
             <div className="modal-footer">
-                <button type="submit" disabled={isProcessing} className="modal-button secondary-button">{submitButtonText}</button>
                 <button type="button" onClick={onClose} className="modal-button primary-button">cancel</button>
+                <button type="submit" disabled={isProcessing} className="modal-button secondary-button">{submitButtonText}</button>
             </div>
         </form>
     );

@@ -16,6 +16,26 @@ export default function WeeklyRecipes({ recipes, enabledMeals }: Props) {
         const savedWeeklyRecipes = localStorage.getItem('weeklyRecipes');
         return savedWeeklyRecipes ? JSON.parse(savedWeeklyRecipes) : Array(7).fill({ breakfast: null, lunch: null, dinner: null });
     });
+
+    useEffect(() => {
+        setWeeklyRecipes(prevWeeklyRecipes => {
+            return prevWeeklyRecipes.map(day => {
+                const updatedDay: Record<MealTime, Recipe | null> = { ...day };
+                for (const mealTime of Object.keys(day) as MealTime[]) {
+                    if (day[mealTime]) {
+                        const updatedRecipe = recipes.find(r => r.id === day[mealTime]?.id);
+                        if (updatedRecipe && updatedRecipe.mealTimes.includes(mealTime as MealTime)) {
+                            updatedDay[mealTime] = updatedRecipe;
+                        } else {
+                            updatedDay[mealTime] = null;
+                        }
+                    }
+                }
+                return updatedDay;
+            });
+        });
+    }, [recipes]);
+
     const [currentDayIndex, setCurrentDayIndex] = useState(new Date().getDay());
     const [showSelectionModal, setShowSelectionModal] = useState(false);
     const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);

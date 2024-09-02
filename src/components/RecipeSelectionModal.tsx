@@ -80,7 +80,7 @@ export default function RecipeSelectionModal({ recipes, onSelect, onClose, mealT
                         {searchedRecipes.map(recipe => (
                             <div key={recipe.id} className="recipe-selection-item" onClick={() => onSelect(recipe)}>
                                 <div className="recipe-selection-url" title={recipe.url}>
-                                    {extractRecipeNameFromUrl(recipe.url)}
+                                    {recipe.name}
                                 </div>
                                 <div className="recipe-selection-difficulty">
                                     <DifficultyRating
