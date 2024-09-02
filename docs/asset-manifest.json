@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.d4cfe24b.css",
-    "main.js": "/static/js/main.426197ab.js",
-    "static/js/453.1fda7c8a.chunk.js": "/static/js/453.1fda7c8a.chunk.js",
-    "index.html": "/index.html",
-    "main.d4cfe24b.css.map": "/static/css/main.d4cfe24b.css.map",
-    "main.426197ab.js.map": "/static/js/main.426197ab.js.map",
-    "453.1fda7c8a.chunk.js.map": "/static/js/453.1fda7c8a.chunk.js.map"
+    "main.css": "/plate-planner/static/css/main.d4cfe24b.css",
+    "main.js": "/plate-planner/static/js/main.eece12e2.js",
+    "static/js/453.1fda7c8a.chunk.js": "/plate-planner/static/js/453.1fda7c8a.chunk.js",
+    "index.html": "/plate-planner/index.html",
+    "main.d4cfe24b.css.map": "/plate-planner/static/css/main.d4cfe24b.css.map",
+    "main.eece12e2.js.map": "/plate-planner/static/js/main.eece12e2.js.map",
+    "453.1fda7c8a.chunk.js.map": "/plate-planner/static/js/453.1fda7c8a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d4cfe24b.css",
-    "static/js/main.426197ab.js"
+    "static/js/main.eece12e2.js"
   ]
 }

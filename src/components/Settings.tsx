@@ -73,6 +73,11 @@ export default function Settings({ enabledMeals, onToggleMeal, onClose, allowRes
             <button onClick={handleImport} className="modal-button secondary-button">import data</button>
           </div>
         </div>
+        <div>
+            <h3>credits</h3>
+            <p>Created with <a href="https://cursor.com">Cursor</a></p>
+            <p>Inspired by Mary Walsh, Monica Walsh, and the <a href="https://www.youtube.com/@AIForHumansShow">AI4Humans Podcast</a></p>
+        </div>
         <div className="modal-footer">
           <button onClick={handleSave} className="modal-button primary-button">save</button>
           <button onClick={onClose} className="modal-button secondary-button">cancel</button>
