@@ -4,7 +4,7 @@ import AddRecipeModal from './components/AddRecipeModal';
 import RecipeListModal from './components/RecipeListModal';
 import Settings from './components/Settings';
 import WeeklyIngredientsModal from './components/WeeklyIngredientsModal';
-import { useRecipes, MealTime } from './hooks/useRecipes';
+import { useRecipes, MealTime, Recipe } from './hooks/useRecipes';
 import './App.css';
 
 function App() {
@@ -21,6 +21,7 @@ function App() {
     const savedAllowReset = localStorage.getItem('allowReset');
     return savedAllowReset ? JSON.parse(savedAllowReset) : false;
   });
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
 
   const handleDataImport = () => {
     window.location.reload();
@@ -31,6 +32,11 @@ function App() {
     setAllowReset(newAllowReset);
     localStorage.setItem('enabledMeals', JSON.stringify(newEnabledMeals));
     localStorage.setItem('allowReset', JSON.stringify(newAllowReset));
+  };
+
+  const handleEdit = (recipe: Recipe) => {
+    setEditingRecipe(recipe);
+    setShowRecipeListModal(true);
   };
 
   return (
@@ -45,7 +51,7 @@ function App() {
         </div>
       </header>
       <main className="main-content">
-        <WeeklyRecipes recipes={recipes} enabledMeals={enabledMeals} />
+        <WeeklyRecipes recipes={recipes} enabledMeals={enabledMeals} onEdit={handleEdit} />
       </main>
       {showAddModal && (
         <AddRecipeModal onAdd={addRecipe} onClose={() => setShowAddModal(false)} />
@@ -53,12 +59,16 @@ function App() {
       {showRecipeListModal && (
         <RecipeListModal
           recipes={recipes}
-          onClose={() => setShowRecipeListModal(false)}
+          onClose={() => {
+            setShowRecipeListModal(false);
+            setEditingRecipe(null);
+          }}
           onEdit={updateRecipe}
           onDelete={deleteRecipe}
           onResetToDefault={resetToDefault}
           onDeleteAll={deleteAllRecipes}
           allowReset={allowReset}
+          editingRecipe={editingRecipe}
         />
       )}
       {showSettings && (

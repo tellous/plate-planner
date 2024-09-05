@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/plate-planner/static/css/main.b5fd8588.css",
-    "main.js": "/plate-planner/static/js/main.e084af1d.js",
+    "main.css": "/plate-planner/static/css/main.79a9812c.css",
+    "main.js": "/plate-planner/static/js/main.eeb0814d.js",
     "static/js/453.1fda7c8a.chunk.js": "/plate-planner/static/js/453.1fda7c8a.chunk.js",
     "index.html": "/plate-planner/index.html",
-    "main.b5fd8588.css.map": "/plate-planner/static/css/main.b5fd8588.css.map",
-    "main.e084af1d.js.map": "/plate-planner/static/js/main.e084af1d.js.map",
+    "main.79a9812c.css.map": "/plate-planner/static/css/main.79a9812c.css.map",
+    "main.eeb0814d.js.map": "/plate-planner/static/js/main.eeb0814d.js.map",
     "453.1fda7c8a.chunk.js.map": "/plate-planner/static/js/453.1fda7c8a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b5fd8588.css",
-    "static/js/main.e084af1d.js"
+    "static/css/main.79a9812c.css",
+    "static/js/main.eeb0814d.js"
   ]
 }

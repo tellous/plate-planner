@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Recipe, MealTime } from '../hooks/useRecipes';
 import DifficultyRating from './DifficultyRating';
 import RecipeForm from './RecipeForm';
@@ -11,10 +11,11 @@ interface Props {
     selectedMealTimes: MealTime[];
     minIngredients: string;
     maxIngredients: string;
+    editingId: string | null;
+    setEditingId: (id: string | null) => void;
 }
 
-export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, selectedMealTimes, minIngredients, maxIngredients }: Props) {
-    const [editingId, setEditingId] = useState<string | null>(null);
+export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, selectedMealTimes, minIngredients, maxIngredients, editingId, setEditingId }: Props) {
     const [editValues, setEditValues] = useState<Recipe>({
         id: '',
         name: '',
@@ -23,6 +24,22 @@ export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, sele
         mealTimes: [],
         ingredients: []
     });
+
+    useEffect(() => {
+        if (editingId) {
+            const recipe = recipes.find(r => r.id === editingId);
+            if (recipe) {
+                setEditValues(recipe);
+                // Scroll to the edited recipe
+                setTimeout(() => {
+                    const element = document.getElementById(`recipe-${editingId}`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
+            }
+        }
+    }, [editingId, recipes]);
 
     const handleEdit = (id: string) => {
         setEditingId(id);
@@ -52,12 +69,15 @@ export default function RecipeList({ recipes, onEdit, onDelete, searchTerm, sele
     return (
         <div className="recipe-list">
             {recipes.map(recipe => (
-                <div key={recipe.id} className="recipe-row">
+                <div key={recipe.id} id={`recipe-${recipe.id}`} className="recipe-row">
                     {editingId === recipe.id ? (
                         <div className="recipe-cell form-cell">
                             <RecipeForm
                                 initialValues={editValues}
-                                onSubmit={onEdit}
+                                onSubmit={(updatedRecipe) => {
+                                    onEdit(updatedRecipe);
+                                    setEditingId(null);
+                                }}
                                 onClose={handleCancel}
                                 submitButtonText="save"
                             />

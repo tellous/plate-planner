@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import RecipeList from './RecipeList';
 import { Recipe, MealTime } from '../hooks/useRecipes';
 import Fuse from 'fuse.js';
@@ -11,13 +11,25 @@ interface Props {
     onResetToDefault: () => void;
     allowReset: boolean;
     onDeleteAll: () => void;
+    editingRecipe: Recipe | null;
 }
 
-export default function RecipeListModal({ recipes, onClose, onEdit, onDelete, onResetToDefault, onDeleteAll, allowReset }: Props) {
+export default function RecipeListModal({ recipes, onClose, onEdit, onDelete, onResetToDefault, onDeleteAll, allowReset, editingRecipe }: Props) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMealTimes, setSelectedMealTimes] = useState<MealTime[]>([]);
     const [minIngredients, setMinIngredients] = useState('0');
     const [maxIngredients, setMaxIngredients] = useState('');
+    const [editingId, setEditingId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (editingRecipe) {
+            setEditingId(editingRecipe.id);
+            setSearchTerm(editingRecipe.name);
+            setSelectedMealTimes([]);
+            setMinIngredients('0');
+            setMaxIngredients('');
+        }
+    }, [editingRecipe]);
 
     const handleMealTimeToggle = (mealTime: MealTime) => {
         setSelectedMealTimes(prev =>
@@ -125,6 +137,8 @@ export default function RecipeListModal({ recipes, onClose, onEdit, onDelete, on
                         selectedMealTimes={selectedMealTimes}
                         minIngredients={minIngredients}
                         maxIngredients={maxIngredients}
+                        editingId={editingId}
+                        setEditingId={setEditingId}
                     />
                 </div>
                 <div className="modal-footer">

@@ -218,6 +218,7 @@ input {
 }
 
 .randomize-btn,
+.edit-btn,
 .manual-select-btn,
 .clear-btn {
   height: 32px;

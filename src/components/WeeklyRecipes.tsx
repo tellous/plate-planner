@@ -9,9 +9,10 @@ const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 
 interface Props {
     recipes: Recipe[];
     enabledMeals: MealTime[];
+    onEdit: (recipe: Recipe) => void;
 }
 
-export default function WeeklyRecipes({ recipes, enabledMeals }: Props) {
+export default function WeeklyRecipes({ recipes, enabledMeals, onEdit }: Props) {
     const [weeklyRecipes, setWeeklyRecipes] = useState<Record<MealTime, Recipe | null>[]>(() => {
         const savedWeeklyRecipes = localStorage.getItem('weeklyRecipes');
         return savedWeeklyRecipes ? JSON.parse(savedWeeklyRecipes) : Array(7).fill({ breakfast: null, lunch: null, dinner: null });
@@ -200,6 +201,7 @@ export default function WeeklyRecipes({ recipes, enabledMeals }: Props) {
                                                     <div className="recipe-buttons">
                                                         <button onClick={() => handleManualSelect(index, mealTime as MealTime)} className="manual-select-btn">🔎</button>
                                                         <button onClick={() => handleRandomize(index, mealTime as MealTime)} className="randomize-btn">🎲</button>
+                                                        {recipe && <button onClick={() => onEdit(recipe)} className="edit-btn">✏️</button>}
                                                         <button onClick={() => handleClearMeal(index, mealTime as MealTime)} className="clear-btn">🗑️</button>
                                                     </div>
                                                 </div>
