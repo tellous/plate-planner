@@ -155,7 +155,7 @@ export default function Settings({ enabledMeals, onSaveSettings, onClose, allowR
             <p>Inspired by Mary Walsh, Monica Walsh, and the <a href="https://www.youtube.com/@AIForHumansShow">AI4Humans Podcast</a></p>
         </div>
         <div>
-          <p>Version 1.1</p>
+          <p>Version 1.2</p>
         </div>
         <div className="modal-footer">
           <button onClick={handleSave} className="modal-button primary-button">save</button>
