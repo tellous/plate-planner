@@ -16,6 +16,7 @@ export default function Settings({ enabledMeals, onSaveSettings, onClose, allowR
   const [tempEnabledMeals, setTempEnabledMeals] = useState<MealTime[]>(enabledMeals);
   const [tempAllowReset, setTempAllowReset] = useState(allowReset);
   const [categories, setCategories] = useState<Record<string, string[]>>(getCategories());
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
   const handleToggleMeal = (meal: MealTime) => {
     setTempEnabledMeals(prev =>
@@ -77,6 +78,13 @@ export default function Settings({ enabledMeals, onSaveSettings, onClose, allowR
     });
   };
 
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
+
   return (
     <div className="modal settings-modal">
       <div className="modal-content settings-content">
@@ -118,19 +126,27 @@ export default function Settings({ enabledMeals, onSaveSettings, onClose, allowR
           <div className="category-management">
             {Object.entries(categories).map(([category, keywords]) => (
               <div key={category} className="category-item">
-                <h4>{category} <button onClick={() => handleRemoveCategory(category)}>Remove</button></h4>
-                <ul>
-                  {keywords.map((keyword) => (
-                    <li key={keyword}>
-                      {keyword}
-                      <button onClick={() => handleRemoveKeyword(category, keyword)}>Remove</button>
-                    </li>
-                  ))}
-                </ul>
-                <button onClick={() => handleAddKeyword(category)}>Add Keyword</button>
+                <div className="category-header" onClick={() => toggleCategory(category)}>
+                  <h4>{category}</h4>
+                  <span>{expandedCategories[category] ? '▼' : '▶'}</span>
+                </div>
+                {expandedCategories[category] && (
+                  <>
+                    <button onClick={() => handleRemoveCategory(category)}>Remove Category</button>
+                    <ul>
+                      {keywords.map((keyword) => (
+                        <li key={keyword}>
+                          {keyword}
+                          <button onClick={() => handleRemoveKeyword(category, keyword)}>Remove</button>
+                        </li>
+                      ))}
+                    </ul>
+                    <button onClick={() => handleAddKeyword(category)}>Add Keyword</button>
+                  </>
+                )}
               </div>
             ))}
-            <button onClick={handleAddCategory}>Add Category</button>
+            <button className='modal-button secondary-button' onClick={handleAddCategory}>Add Category</button>
           </div>
         </div>
         <div>

@@ -24,7 +24,7 @@ export function categorizeIngredient(ingredient: string): IngredientCategory {
   
   for (const word of words) {
     for (const [category, keywords] of Object.entries(categories)) {
-      if (keywords.includes(word) || keywords.includes(word + 's')) {
+      if (keywords.includes(word) || keywords.includes(word + 's') || keywords.includes(word + 'es')) {
         return category as IngredientCategory;
       }
     }
