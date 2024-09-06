@@ -1,14 +1,17 @@
 import { Recipe } from '../hooks/useRecipes';
+import { getCategories, saveCategories } from './ingredientCategories';
 
 export async function exportData() {
   const recipes = localStorage.getItem('recipes');
   const weeklyRecipes = localStorage.getItem('weeklyRecipes');
   const ingredientState = localStorage.getItem('ingredientState');
+  const categories = getCategories();
 
   const data = {
     recipes: recipes ? JSON.parse(recipes) : [],
     weeklyRecipes: weeklyRecipes ? JSON.parse(weeklyRecipes) : [],
     ingredientState: ingredientState ? JSON.parse(ingredientState) : {},
+    categories,
   };
 
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -33,11 +36,12 @@ export async function importData(): Promise<boolean> {
         try {
           const text = await file.text();
           const data = JSON.parse(text);
-          
+
           if (data.recipes) localStorage.setItem('recipes', JSON.stringify(data.recipes));
           if (data.weeklyRecipes) localStorage.setItem('weeklyRecipes', JSON.stringify(data.weeklyRecipes));
           if (data.ingredientState) localStorage.setItem('ingredientState', JSON.stringify(data.ingredientState));
-          
+          if (data.categories) saveCategories(data.categories);
+
           resolve(true);
         } catch (error) {
           console.error('Error importing data:', error);

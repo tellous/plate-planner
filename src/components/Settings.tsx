@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MealTime } from '../hooks/useRecipes';
 import { exportData, importData } from '../utils/dataUtils';
+import { getCategories, saveCategories } from '../utils/ingredientCategories';
 
 interface Props {
   enabledMeals: MealTime[];
@@ -14,6 +15,7 @@ export default function Settings({ enabledMeals, onSaveSettings, onClose, allowR
   const allMeals: MealTime[] = ['breakfast', 'lunch', 'dinner'];
   const [tempEnabledMeals, setTempEnabledMeals] = useState<MealTime[]>(enabledMeals);
   const [tempAllowReset, setTempAllowReset] = useState(allowReset);
+  const [categories, setCategories] = useState<Record<string, string[]>>(getCategories());
 
   const handleToggleMeal = (meal: MealTime) => {
     setTempEnabledMeals(prev =>
@@ -23,6 +25,7 @@ export default function Settings({ enabledMeals, onSaveSettings, onClose, allowR
 
   const handleSave = () => {
     onSaveSettings(tempEnabledMeals, tempAllowReset);
+    saveCategories(categories);
     onClose();
   };
 
@@ -41,6 +44,37 @@ export default function Settings({ enabledMeals, onSaveSettings, onClose, allowR
         onClose();
       }
     }
+  };
+
+  const handleAddCategory = () => {
+    const newCategory = prompt('Enter new category name:');
+    if (newCategory && !categories[newCategory]) {
+      setCategories({ ...categories, [newCategory]: [] });
+    }
+  };
+
+  const handleRemoveCategory = (category: string) => {
+    if (window.confirm(`Are you sure you want to remove the "${category}" category?`)) {
+      const { [category]: _, ...rest } = categories;
+      setCategories(rest);
+    }
+  };
+
+  const handleAddKeyword = (category: string) => {
+    const newKeyword = prompt(`Enter new keyword for ${category}:`);
+    if (newKeyword) {
+      setCategories({
+        ...categories,
+        [category]: [...categories[category], newKeyword],
+      });
+    }
+  };
+
+  const handleRemoveKeyword = (category: string, keyword: string) => {
+    setCategories({
+      ...categories,
+      [category]: categories[category].filter((k) => k !== keyword),
+    });
   };
 
   return (
@@ -79,6 +113,24 @@ export default function Settings({ enabledMeals, onSaveSettings, onClose, allowR
             <h3>data management</h3>
             <button onClick={handleExport} className="modal-button secondary-button">export data</button>
             <button onClick={handleImport} className="modal-button secondary-button">import data</button>
+          </div>
+          <h3>ingredient categories</h3>
+          <div className="category-management">
+            {Object.entries(categories).map(([category, keywords]) => (
+              <div key={category} className="category-item">
+                <h4>{category} <button onClick={() => handleRemoveCategory(category)}>Remove</button></h4>
+                <ul>
+                  {keywords.map((keyword) => (
+                    <li key={keyword}>
+                      {keyword}
+                      <button onClick={() => handleRemoveKeyword(category, keyword)}>Remove</button>
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={() => handleAddKeyword(category)}>Add Keyword</button>
+              </div>
+            ))}
+            <button onClick={handleAddCategory}>Add Category</button>
           </div>
         </div>
         <div>

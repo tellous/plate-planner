@@ -1,6 +1,6 @@
 export type IngredientCategory = string;
 
-const categoryKeywords: Record<IngredientCategory, string[]> = {
+const DEFAULT_CATEGORIES: Record<IngredientCategory, string[]> = {
   meat: ['beef', 'chicken', 'pork', 'lamb', 'turkey', 'fish', 'salmon', 'shrimp', 'bacon', 'sausage'],
   dairy: ['milk', 'cheese', 'yogurt', 'butter', 'cream', 'egg'],
   produce: ['apple', 'banana', 'carrot', 'lettuce', 'tomato', 'onion', 'garlic', 'potato', 'pepper', 'broccoli', 'spinach', 'cucumber'],
@@ -9,12 +9,22 @@ const categoryKeywords: Record<IngredientCategory, string[]> = {
   other: [],
 };
 
+export function getCategories(): Record<IngredientCategory, string[]> {
+  const savedCategories = localStorage.getItem('ingredientCategories');
+  return savedCategories ? JSON.parse(savedCategories) : DEFAULT_CATEGORIES;
+}
+
+export function saveCategories(categories: Record<IngredientCategory, string[]>) {
+  localStorage.setItem('ingredientCategories', JSON.stringify(categories));
+}
+
 export function categorizeIngredient(ingredient: string): IngredientCategory {
+  const categories = getCategories();
   const words = ingredient.toLowerCase().split(' ');
   
   for (const word of words) {
-    for (const [category, keywords] of Object.entries(categoryKeywords)) {
-      if (keywords.includes(word)) {
+    for (const [category, keywords] of Object.entries(categories)) {
+      if (keywords.includes(word) || keywords.includes(word + 's')) {
         return category as IngredientCategory;
       }
     }
